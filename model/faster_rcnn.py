@@ -215,12 +215,12 @@ class FasterRCNN(nn.Module):
                 prepared_imgs.append(img)
                 sizes.append(size)
         else:
-             prepared_imgs = imgs 
+             prepared_imgs = imgs
         bboxes = list()
         labels = list()
         scores = list()
         for img, size in zip(prepared_imgs, sizes):
-            img = t.autograd.Variable(at.totensor(img).float()[None], volatile=True)
+            img = t.autograd.Variable(at.totensor(img).float()[None])
             scale = img.shape[3] / size[1]
             roi_cls_loc, roi_scores, rois, _ = self(img, scale=scale)
             # We are assuming that batch size is 1.
@@ -262,7 +262,7 @@ class FasterRCNN(nn.Module):
 
     def get_optimizer(self):
         """
-        return optimizer, It could be overwriten if you want to specify 
+        return optimizer, It could be overwriten if you want to specify
         special optimizer
         """
         lr = opt.lr

@@ -1,0 +1,9 @@
+.idea/
+.ipynb_checkpoints/
+__pycache__/
+checkpoints/
+*.pyc
+*.pth
+model/utils/nms/build/
+model/utils/nms/_nms_gpu_post.c
+model/utils/nms/_nms_gpu_post.cpython-35m-x86_64-linux-gnu.so

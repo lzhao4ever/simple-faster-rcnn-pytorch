@@ -28,7 +28,7 @@ def eval(dataloader, faster_rcnn, test_num=10000):
     pred_bboxes, pred_labels, pred_scores = list(), list(), list()
     gt_bboxes, gt_labels, gt_difficults = list(), list(), list()
     for ii, (imgs, sizes, gt_bboxes_, gt_labels_, gt_difficults_) in tqdm(enumerate(dataloader)):
-        sizes = [sizes[0][0], sizes[1][0]]
+        sizes = [sizes[0][0].item(), sizes[1][0].item()]
         pred_bboxes_, pred_labels_, pred_scores_ = faster_rcnn.predict(imgs, [sizes])
         gt_bboxes += list(gt_bboxes_.numpy())
         gt_labels += list(gt_labels_.numpy())
@@ -85,7 +85,11 @@ def train(**kwargs):
                     ipdb.set_trace()
 
                 # plot loss
-                trainer.vis.plot_many(trainer.get_meter_data())
+                # trainer.vis.plot_many(trainer.get_meter_data())
+                meter_data = trainer.get_meter_data()
+                for k in meter_data.keys():
+                    meter_data[k] = meter_data[k].cpu().detach().numpy()
+                trainer.vis.plot_many(meter_data)
 
                 # plot groud truth bboxes
                 ori_img_ = inverse_normalize(at.tonumpy(img[0]))
@@ -106,6 +110,7 @@ def train(**kwargs):
                 trainer.vis.text(str(trainer.rpn_cm.value().tolist()), win='rpn_cm')
                 # roi confusion matrix
                 trainer.vis.img('roi_cm', at.totensor(trainer.roi_cm.conf, False).float())
+
         eval_result = eval(test_dataloader, faster_rcnn, test_num=opt.test_num)
 
         if eval_result['map'] > best_map:
@@ -121,7 +126,7 @@ def train(**kwargs):
                                                   str(eval_result['map']),
                                                   str(trainer.get_meter_data()))
         trainer.vis.log(log_info)
-        if epoch == 13: 
+        if epoch == 13:
             break
 
 
